@@ -15,3 +15,9 @@
 ```bash
 chmod +x linux-autocleaner.sh
 sudo ./linux-autocleaner.sh
+
+## ☕ Support this project
+
+If you like **Linux AutoCleaner** and want to support me, you can buy me a coffee:
+
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" width="150"/>](https://buymeacoffee.com/martinthehacker)
