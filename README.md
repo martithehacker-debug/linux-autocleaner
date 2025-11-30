@@ -1,3 +1,5 @@
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=000)](https://buymeacoffee.com/martinthehacker)
+
 # Linux AutoCleaner v1.0
 
 **A safe, one-click optimization script for Linux beginners.**
@@ -10,14 +12,3 @@
 - Show system info (uptime + disk usage)
 - Beginner-friendly
 
-## How to Run
-
-```bash
-chmod +x linux-autocleaner.sh
-sudo ./linux-autocleaner.sh
-
-## ☕ Support this project
-
-If you like **Linux AutoCleaner** and want to support me, you can buy me a coffee:
-
-[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" alt="Buy Me A Coffee" width="150"/>](https://buymeacoffee.com/martinthehacker)
