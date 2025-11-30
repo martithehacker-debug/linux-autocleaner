@@ -1,54 +1,65 @@
 #!/bin/bash
+# Linux AutoCleaner v1.0 - Safe multi-distro cleanup
 
-# ================================
-#   Linux AutoCleaner v1.0
-#   by Martin
-# ================================
-
-GREEN="\e[32m"
-CYAN="\e[36m"
-RESET="\e[0m"
-
-echo -e "${CYAN}=== Linux AutoCleaner v1.0 ===${RESET}"
+echo "=== Linux AutoCleaner v1.0 ==="
 echo "Starting optimization..."
-sleep 1
 
-# --- Check sudo ---
-if [[ $EUID -ne 0 ]]; then
-    echo "Please run with: sudo ./linux-autocleaner.sh"
+# Function to confirm actions
+confirm() {
+    read -p "$1 [y/N]: " response
+    [[ "$response" =~ ^[Yy]$ ]]
+}
+
+# Detect package manager
+if command -v pacman &>/dev/null; then
+    PKG="pacman"
+elif command -v apt &>/dev/null; then
+    PKG="apt"
+elif command -v dnf &>/dev/null; then
+    PKG="dnf"
+elif command -v zypper &>/dev/null; then
+    PKG="zypper"
+else
+    echo "Unsupported Linux distribution."
     exit 1
 fi
 
-# --- Clean package cache ---
-echo -e "${GREEN}→ Cleaning package cache...${RESET}"
-if command -v pacman &> /dev/null; then
-    pacman -Scc --noconfirm
-elif command -v apt &> /dev/null; then
-    apt clean
-elif command -v dnf &> /dev/null; then
-    dnf clean all
-elif command -v zypper &> /dev/null; then
-    zypper clean
+# Clean package cache
+if confirm "→ Remove all cached packages?"; then
+    case "$PKG" in
+        pacman) sudo pacman -Scc ;;
+        apt) sudo apt clean ;;
+        dnf) sudo dnf clean all ;;
+        zypper) sudo sudo zypper clean ;;
+    esac
+else
+    echo "Skipping package cache cleanup."
 fi
 
-# --- Remove old logs ---
-echo -e "${GREEN}→ Removing old logs...${RESET}"
-rm -f /var/log/*.log
-journalctl --vacuum-time=7d &>/dev/null
-
-# --- Clear thumbnail cache ---
-echo -e "${GREEN}→ Clearing thumbnail cache...${RESET}"
-rm -rf ~/.cache/thumbnails/*
-
-# --- Remove orphan packages (Arch only) ---
-if command -v pacman &> /dev/null; then
-    echo -e "${GREEN}→ Removing orphan packages...${RESET}"
-    pacman -Qtdq &>/dev/null && pacman -Rns $(pacman -Qtdq) --noconfirm
+# Remove orphan packages (Arch only)
+if [[ "$PKG" == "pacman" ]] && confirm "→ Remove orphan packages?"; then
+    ORPHANS=$(pacman -Qtdq)
+    if [[ -n "$ORPHANS" ]]; then
+        sudo pacman -Rns $ORPHANS
+    else
+        echo "No orphan packages found."
+    fi
 fi
 
-# --- System info ---
-echo -e "${CYAN}\n=== System Info ===${RESET}"
-echo "Uptime:"; uptime
-echo "Disk usage:"; df -h /
+# Remove old logs
+if confirm "→ Remove old logs?"; then
+    sudo rm -v /var/log/*.log
+fi
 
-echo -e "${CYAN}\n🎉 Optimization Done! Your system should feel faster.${RESET}"
+# Clear thumbnail cache
+if confirm "→ Clear thumbnail cache?"; then
+    rm -rf ~/.cache/thumbnails/*
+fi
+
+# Show system info
+echo "=== System Info ==="
+uptime
+df -h
+
+echo "🎉 Optimization Done! Your system should feel faster."
+
